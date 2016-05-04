@@ -4,6 +4,8 @@
 # Run this command to configure your shell on OSX:
 # $ eval "$(docker-machine env default)"
 
+# some stuff
+
 version: '2.0'
 
 services:
