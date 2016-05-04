@@ -1,0 +1,115 @@
+# CIRR-docker up!
+# Merck, Spring 2016
+
+# Run this command to configure your shell on OSX:
+# $ eval "$(docker-machine env default)"
+
+version: '2.0'
+
+services:
+
+  # ----------------------------
+  db:
+  # Provides DB services for orthanc and xnat instances
+  # ----------------------------
+    image: postgres
+    expose:
+    - "5432"
+    environment:
+
+      # source these from .shadow_rc or other
+      DB_SUPER_USER:
+      DB_SUPER_PASSWORD:
+
+      DB_ORTHANC_USER:
+      DB_ORTHANC_DB_PASSWORD:
+
+      DB_XNAT_USER:
+      DB_XNAT_PASSWORD:
+
+    volumes:
+    - /var/lib/postgresql
+
+    # Bootstrapping postgres for orthanc and xnat
+    # Note the interesting single quote escapes
+    # $ docker-compose up db
+
+    # $ docker exec -it cirrdocker_db_1 sh -c 'echo "CREATE USER ${DB_XNAT_USER} WITH PASSWORD '\''${DB_XNAT_PASSWORD}'\'';" | exec psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U db_user'
+
+
+    # $ docker exec -it cirrdocker_db_1 sh -c 'echo "CREATE USER xnat WITH PASSWORD '\''xnat_pword'\'';" | exec psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U db_user'
+    # $ docker exec -it cirrdocker_db_1 sh -c 'echo "CREATE DATABASE xnat WITH OWNER xnat;" | exec psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U db_user'
+    # $ docker exec -it cirrdocker_db_1 sh -c 'echo "CREATE USER orthanc WITH PASSWORD '\''orthanc_pword'\'';" | exec psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U db_user'
+    # $ docker exec -it cirrdocker_db_1 sh -c 'echo "CREATE DATABASE orthanc WITH OWNER orthanc;" | exec psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U db_user'
+
+    # Changing a password:
+    # $ docker exec -it cirrdocker_db_1 sh -c 'echo "ALTER USER xnat WITH PASSWORD '\''xnat_pword'\'';" | exec psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U db_user'
+
+  # ----------------------------
+  orthanc:
+  # See <https://github.com/jodogne/OrthancDocker>
+  # Tier 1 VNA, "gatekeeper" w/PHI
+  # ----------------------------
+
+    image: jodogne/orthanc-plugins
+    ports:
+    - "4242:4242"
+    - "8042:8042"
+    volumes:
+    - ./orthanc.json:/etc/orthanc/orthanc.json:ro
+    - /var/lib/orthanc/db/  # Mounting this as a mapped folder fails on OSX
+    links:
+    - db
+
+    # Bootstrapping orthanc:
+    # $ docker run --rm --entrypoint=cat jodogne/orthanc /etc/orthanc/orthanc.json > ./orthanc.json
+    #  => Edit orthanc.json
+    #  => Modify the RegisteredUsers section to add clinic-facing users
+    #  => Add the postgres config section
+
+  # ----------------------------
+  xnat:
+  # See <https://github.com/igortopcin/xnat-docker>
+  # Tier 2 VNA, no PHI
+  # ----------------------------
+    build: xnat-docker
+    ports:
+      - "8080:8080"
+      - "8104:8104"
+    environment:
+      DB_HOST: postgres
+      DB_NAME: xnat
+      DB_USER: xnat
+      DB_PASSWORD: xnat_pword
+      SITE_URL: http://192.168.99.100:8080/xnat
+    volumes:
+    - /opt/data
+    links:
+    - db:postgres
+
+  # Bootstrapping xnat:
+  # $ docker exec -it cirrdocker_xnat_1 init-database.sh
+
+  # Upgrading xnat
+  # $ docker exec -it cirrdocker_xnat_1 /bin/bash
+  # % services stop tomcat
+  # % cd ../xnat
+  #   => Modify properties
+  # % bin/update.sh -Ddeploy
+
+  # ----------------------------
+  # xnat2:
+  # Dedicated receiver for load balancing
+  # ----------------------------
+  # ...
+
+
+  # ----------------------------
+  # splunk:
+  # ----------------------------
+  # ...
+
+
+#volumes:
+#  data: {}
+#  logging: {}
