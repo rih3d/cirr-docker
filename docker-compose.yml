@@ -27,10 +27,12 @@ services:
       POSTGRES_PASSWORD: ${DB_SUPER_PASSWORD}
 
       DB_ORTHANC_USER:
-      DB_ORTHANC_DB_PASSWORD:
+      DB_ORTHANC_PASSWORD:
+      DB_ORTHANC_NAME:
 
       DB_XNAT_USER:
       DB_XNAT_PASSWORD:
+      DB_XNAT_NAME:
 
     volumes:
     - /var/lib/postgresql
@@ -39,7 +41,10 @@ services:
     # Note the interesting single quote escapes
     # $ docker-compose up db
 
-    # $ docker exec -it cirrdocker_db_1 sh -c 'echo "CREATE USER ${DB_XNAT_USER} WITH PASSWORD '\''${DB_XNAT_PASSWORD}'\'';" | exec psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U db_user'
+    # $ docker exec -it cirrdocker_db_1 sh -c 'echo "CREATE USER ${DB_XNAT_USER} WITH PASSWORD '\''${DB_XNAT_PASSWORD}'\'';" | exec psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U ${DB_SUPER_USER}'
+    # $ docker exec -it cirrdocker_db_1 sh -c 'echo "CREATE DATABASE ${DB_XNAT_NAME} WITH OWNER ${DB_XNAT_USER};" | exec psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U ${DB_SUPER_USER}'
+    # $ docker exec -it cirrdocker_db_1 sh -c 'echo "CREATE USER ${DB_ORTHANC_USER} WITH PASSWORD '\''${DB_ORTHANC_PASSWORD}'\'';" | exec psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U ${DB_SUPER_USER}'
+    # $ docker exec -it cirrdocker_db_1 sh -c 'echo "CREATE DATABASE ${DB_ORTHANC_NAME} WITH OWNER ${DB_ORTHANC_USER};" | exec psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U ${DB_SUPER_USER}'
 
 
     # $ docker exec -it cirrdocker_db_1 sh -c 'echo "CREATE USER xnat WITH PASSWORD '\''xnat_pword'\'';" | exec psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U db_user'
