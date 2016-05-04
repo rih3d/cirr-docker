@@ -231,9 +231,9 @@
     "EnableStorage" : true,
     "Host" : "db",
     "Port" : 5432,
-    "Database" : "${DB_ORTHANC_NAME}",
-    "Username" : "${DB_ORTHANC_USER}",
-    "Password" : "${DB_ORTHANC_PASSWORD}"
+    "Database" : "DB_ORTHANC_NAME",
+    "Username" : "DB_ORTHANC_USER",
+    "Password" : "DB_ORTHANC_PASSWORD"
   }
 
 }
