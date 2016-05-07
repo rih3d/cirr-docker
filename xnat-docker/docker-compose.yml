@@ -1,25 +1,78 @@
-xnat:
-  restart: never
-  image: xnat
-  ports:
-    - 8080:8080
-    - 8104:8104
-  environment:
-    DB_HOST: postgres
-    DB_NAME: xnat
-    DB_USER: xnat
-    DB_PASSWORD: calvin
-    SITE_URL: "http:\/\/192.168.59.103:8080\/xnat"
-  links:
-    - postgres
-postgres:
-  restart: never
-  image: postgres:9.4
-  environment:
-    POSTGRES_PASSWORD: calvin
-  volumes_from:
-    - dbdata
-dbdata:
-  restart: never
-  image: postgres
-  command: echo "Data-only container for postgres"
+# CIRR-docker up!
+# Merck, Spring 2016
+
+# Run this command to configure your shell on OSX:
+# $ eval "$(docker-machine env default)"; source .shadow_profile
+
+version: '2.0'
+
+services:
+
+  # ----------------------------
+  db:
+  # Provides DB services for orthanc and xnat instances
+  # ----------------------------
+    image: postgres
+    expose:
+    - "5432"
+    environment:
+
+      # Necessary for initialization
+      POSTGRES_USER: ${DB_SUPER_USER}
+      POSTGRES_PASSWORD: ${DB_SUPER_PASSWORD}
+
+    volumes:
+    - /var/lib/postgresql
+    # *.sh mounted in initdb.d will be sourced
+    - ./xnat-postgres/xnat.sql:/docker-entrypoint-initdb.d/xnat.sql:ro
+
+    # Changing a password or interacting with the database:
+    # $ docker exec -it cirrdocker_db_1 sh -c 'echo "ALTER USER xnat WITH PASSWORD '\''my_xnat_pword'\'';" | exec psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U ${DB_SUPER_USER}'
+
+
+  # ----------------------------
+  xnat-repo:
+    build: xnat-local-repo
+
+  xnat-template:
+    build: xnat-template
+    container_name: xnat-template
+
+  xnat:
+    build: xnat
+    depends_on:
+    - db
+    - xnat-repo
+#    - xnat-template
+    ports:
+      - "8080:8080"
+      - "8104:8104"
+#    volumes:
+#    - /opt/xnat
+    links:
+    - xnat-repo:repo
+    - db:postgres
+
+  # Upgrading xnat
+  # $ docker exec -it cirrdocker_xnat_1 /bin/bash
+  # % services stop tomcat
+  # % cd ../xnat
+  #   => Modify properties
+  # % bin/update.sh -Ddeploy
+
+  # ----------------------------
+  # xnat2:
+  # Dedicated receiver for load balancing
+  # ----------------------------
+  # ...
+
+
+  # ----------------------------
+  # splunk:
+  # ----------------------------
+  # ...
+
+
+#volumes:
+#  data: {}
+#  logging: {}

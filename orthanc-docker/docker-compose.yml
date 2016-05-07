@@ -1,0 +1,58 @@
+# CIRR-docker up!
+# Merck, Spring 2016
+
+# Run this command to configure your shell on OSX:
+# $ eval "$(docker-machine env default)"; source .shadow_profile
+
+version: '2.0'
+
+services:
+
+  # ----------------------------
+  db:
+  # Provides DB services for orthanc and xnat instances
+  # ----------------------------
+    image: postgres
+    ports:
+    - "5432:5432"
+    environment:
+
+      # Necessary for initialization
+      POSTGRES_USER: ${DB_SUPER_USER}
+      POSTGRES_PASSWORD: ${DB_SUPER_PASSWORD}
+
+      # source these from .shadow_rc or other for bootstrap.sh
+      DB_SUPER_USER: ${DB_SUPER_USER}
+      DB_SUPER_PASSWORD: ${DB_SUPER_PASSWORD}
+
+      DB_ORTHANC_USER: ${DB_ORTHANC_USER}
+      DB_ORTHANC_PASSWORD: ${DB_ORTHANC_PASSWORD}
+      DB_ORTHANC_NAME: orthanc
+
+    volumes:
+    - ./db_data/:/var/lib/postgresql
+    # *.sh mounted in initdb.d will be sourced
+    - ./bootstrap-db.sh:/docker-entrypoint-initdb.d/bootstrap.sh:ro
+
+    # Changing a password or interacting with the database:
+    # $ docker exec -it cirrdocker_db_1 sh -c 'echo "ALTER USER xnat WITH PASSWORD '\''my_xnat_pword'\'';" | exec psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U ${DB_SUPER_USER}'
+
+  # ----------------------------
+  orthanc:
+  # See <https://github.com/jodogne/OrthancDocker>
+  # Tier 1 VNA, "gatekeeper" w/PHI
+  #
+  # $ ./bootstrap-config.sh
+  # $ docker-compose up db orthanc
+  # ----------------------------
+
+    image: jodogne/orthanc-plugins
+    ports:
+    - "8042:8042"
+    - "4042:4042"
+    volumes:
+    - ./shadow.orthanc.json:/etc/orthanc/orthanc.json:ro
+#    - ./orthanc_data/:/var/lib/orthanc/db/  # Mounting this as a _mapped_ folder fails on OSX
+    - /var/lib/orthanc/db/
+    links:
+    - db
