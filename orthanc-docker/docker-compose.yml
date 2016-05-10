@@ -1,16 +1,21 @@
 # CIRR-docker up!
 # Merck, Spring 2016
 
+# Need in env $POSTGRES_USER, $POSTGRES_PASSWORD, $POSTGRES_CIRR_USER, $POSTGRES_CIRR_PASSWORD
+
 # Run this command to configure your shell on OSX:
 # $ eval "$(docker-machine env default)"; source .shadow_profile
+# $ ./bootstrap-orthanc.sh
+# $ docker-compose up
+
+# Need a splunk server that can attach to the log directories...
 
 version: '2.0'
 
 services:
 
   # ----------------------------
-  db:
-  # Provides DB services for orthanc and xnat instances
+  postgres:
   # ----------------------------
     image: postgres
     ports:
@@ -18,41 +23,44 @@ services:
     environment:
 
       # Necessary for initialization
-      POSTGRES_USER: ${DB_SUPER_USER}
-      POSTGRES_PASSWORD: ${DB_SUPER_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /var/lib/postgresql/data
 
-      # source these from .shadow_rc or other for bootstrap.sh
-      DB_SUPER_USER: ${DB_SUPER_USER}
-      DB_SUPER_PASSWORD: ${DB_SUPER_PASSWORD}
-
-      DB_ORTHANC_USER: ${DB_ORTHANC_USER}
-      DB_ORTHANC_PASSWORD: ${DB_ORTHANC_PASSWORD}
-      DB_ORTHANC_NAME: orthanc
+      POSTGRES_CIRR_USER: ${CIRR_POSTGRES_USER}
+      POSTGRES_CIRR_PASSWORD: ${CIRR_POSTGRES_PASSWORD}
 
     volumes:
-    - ./db_data/:/var/lib/postgresql
-    # *.sh mounted in initdb.d will be sourced
-    - ./bootstrap-db.sh:/docker-entrypoint-initdb.d/bootstrap.sh:ro
+    - data:/var/lib/postgresql
+    - logs:/var/log/postgresql
+    # *.sh mounted in initdb.d will be sourced on run, should check to see if configured
+    - ./bootstrap-postgres.sh:/docker-entrypoint-initdb.d/bootstrap.sh:ro
 
-    # Changing a password or interacting with the database:
-    # $ docker exec -it cirrdocker_db_1 sh -c 'echo "ALTER USER xnat WITH PASSWORD '\''my_xnat_pword'\'';" | exec psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U ${DB_SUPER_USER}'
+    # Interacting with the database:
+    # $ docker exec -it cirrdocker_db_1 sh -c 'echo "ALTER USER xnat WITH PASSWORD '\''my_xnat_pword'\'';" | exec psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U ${POSTGRES_USER}'
 
   # ----------------------------
   orthanc:
   # See <https://github.com/jodogne/OrthancDocker>
-  # Tier 1 VNA, "gatekeeper" w/PHI
-  #
-  # $ ./bootstrap-config.sh
-  # $ docker-compose up db orthanc
   # ----------------------------
 
+    # Churn if postgres is not responsive
+    restart: on-failure:10
+
     image: jodogne/orthanc-plugins
+    command: ["--logdir=/var/log/orthanc", "/etc/orthanc/"]
     ports:
     - "8042:8042"
     - "4042:4042"
     volumes:
-    - ./shadow.orthanc.json:/etc/orthanc/orthanc.json:ro
-#    - ./orthanc_data/:/var/lib/orthanc/db/  # Mounting this as a _mapped_ folder fails on OSX
-    - /var/lib/orthanc/db/
+    - ./orthanc.shadow.json:/etc/orthanc/orthanc.json:ro
+    - data:/var/lib/orthanc/db
+    - logs:/var/log/orthanc
     links:
-    - db
+    - postgres
+    depends_on:
+    - postgres
+
+volumes:
+  data: {}
+  logs: {}

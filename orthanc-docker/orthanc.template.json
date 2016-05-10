@@ -5,7 +5,7 @@
 
   // The logical name of this instance of Orthanc. This one is
   // displayed in Orthanc Explorer and at the URI "/system".
-  "Name" : "CIRR-Orthanc",
+  "Name" : "Orthanc",
 
   // Path to the directory that holds the heavyweight files
   // (i.e. the raw DICOM instances)
@@ -229,11 +229,17 @@
   "PostgreSQL" : {
     "EnableIndex" : true,
     "EnableStorage" : true,
-    "Host" : "db",
+    "Host" : "%DB_HOST%",
     "Port" : 5432,
-    "Database" : "DB_ORTHANC_NAME",
-    "Username" : "DB_ORTHANC_USER",
-    "Password" : "DB_ORTHANC_PASSWORD"
+    "Database" : "%DB_NAME%",
+    "Username" : "%DB_USER%",
+    "Password" : "%DB_PASSWORD%"
+  },
+
+  "WebViewer" : {
+    "CachePath" : "/var/lib/orthanc/WebViewerCache",
+    "CacheSize" : 100,
+    "Threads" : 4
   }
 
 }
