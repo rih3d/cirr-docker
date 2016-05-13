@@ -13,9 +13,8 @@ services:
     - "5432:5432"
     environment:
 
-      # Necessary for initialization
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: passw0rd
       PGDATA: /var/lib/postgresql/data
 
     volumes:
@@ -23,7 +22,7 @@ services:
     - logs:/var/log/postgresql
     # *.sh mounted in initdb.d will be sourced on run, should check to see if configured
     # Drop XNAT if necessary, add orthanc and orthanc_recv
-    - ./bootstrap-postgres.sh:/docker-entrypoint-initdb.d/bootstrap.sh:ro
+    #- ./bootstrap-postgres.sh:/docker-entrypoint-initdb.d/bootstrap.sh:ro
 
     # Interacting with the database:
     # $ docker exec -it cirrdocker_db_1 sh -c 'echo "ALTER USER xnat WITH PASSWORD '\''my_xnat_pword'\'';" | exec psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U ${POSTGRES_USER}'
@@ -32,45 +31,62 @@ services:
   orthanc:
   # See <https://github.com/jodogne/OrthancDocker>
   # ----------------------------
-
     # Churn if postgres is not responsive
     restart: on-failure:10
-
     image: jodogne/orthanc-plugins
     command: ["--logdir=/var/log/orthanc", "/etc/orthanc/"]
     ports:
-    - "8042:4080"
-    - "4242:4042"
+    - "8042:4280"
+    - "4242:4242"
     volumes:
     - ./orthanc.shadow.json:/etc/orthanc/orthanc.json:ro
     - data:/var/lib/orthanc/db
     - logs:/var/log/orthanc
-    links:
-    - postgres
-    - xnat
-    depends_on:
-    - postgres
     environment:
+      SITE_NAME: "Orthanc"
+      DICOM_AET:  "ORTHANC"
       COMPRESSION: "true"
+
+      USERS: '{
+        admin: passw0rd
+        orthanc: orthanc
+        }'
+
+      DICOM_MODALITIES: '{
+        "sample_modality" : [ "STORESCP", "localhost", 2000 ]
+      }'
+
+      ORTHANC_PEERS: '{
+        "sample_peer"  : [ "http://localhost:8043/", "alice", "alicePassword" ]
+      }'
+
       DB_NAME: "orthanc"
+      DB_USER: "orthanc"
+      DB_PASSWORD: "passw0rd"
+
+
 
   # ----------------------------
   orthanc-receiver:
   # ----------------------------
     extends: orthanc
     ports:
-    - "8042:4081"
-    - "4242:4043"
+    - "8042:4380"
+    - "4242:4342"
     volumes:
     - ./orthanc_recv.shadow.json:/etc/orthanc/orthanc.json:ro
-    - data/var/lib/orthanc_recv/db:/var/lib/orthanc/db
-    - logs/var/log/orthanc_recv:/var/log/orthanc
+    - data:/var/lib/orthanc_recv/db
+    - logs:/var/log/orthanc_recv
     links:
+    - postgres
     - orthanc
     environment:
+      SITE_NAME: "Orthanc Receiver"
+      DICOM_AET:  "ORTHANC_RECV"
       COMPRESSION: "false"
-      DB_NAME: "orthanc_recv"
       FORWARD_TO: "orthanc"
+      LOG_EXPORTED: "false"
+      DB_NAME: "orthanc_recv"
 
   # ----------------------------
   xnat:
@@ -83,28 +99,40 @@ services:
     # - Unk API?
     volumes:
     - data:/data/xnat
-    links:
-    - postgres
-    - orthanc
-    - orthanc_recv
+#    links:
+#    - postgres
+#    - orthanc
+#    - orthanc-receiver
     depends_on:
     - postgres
+    environment:
+      XNAT_DIR: /data/xnat
+      SITE_URL: localhost:8080
+      XNAT_NAME: xnat
+      POSTGRES_USER: "xnat"
+      POSTGRES_PASSWORD: "passw0rd"
+      DB_NAME: xnat
 
   # ----------------------------
   splunk:
   # ----------------------------
     image: outcoldman/splunk:latest
+    hostname: splunk
     volumes:
-    - data/var/lib/splunk/etc:/opt/splunk/etc
-    - data/var/lib/splunk/data:/opt/splunk/var
+    - data:/opt/splunk/etc
+    - data:/opt/splunk/var
     volumes_from:
-    - logs
+    - postgres
+    - orthanc
+    - orthanc-receiver
+    - xnat
     ports:
-    - "5514:514"   # Syslog
-    - "5080:8000"  # HTTP
+    - "1514:1514"   # Syslog
+    - "1580:8000"   # HTTP
     # - Unk API?
     environment:
       SPLUNK_START_ARGS: "--accept-license"
+      # Need to add log directories to monitor as well...
 
 volumes:
   data: {}

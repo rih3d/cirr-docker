@@ -22,8 +22,14 @@ Spins up a Docker-based medical imaging informatics platform.
 
 ## Dependencies
 
-- Docker, docker-compose
-- Python 2.7, pyyaml
+- [Docker], [docker-compose] for service virtualization
+- [Python] 2.7, [pyyaml], [jinja2] for `bootstrap.py`
+
+[Docker]:()
+[docker-compose]:()
+[Python]:()
+[pyyaml]:()
+[jinja2]:()
 
 ## Configurations
 
