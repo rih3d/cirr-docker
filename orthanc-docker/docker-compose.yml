@@ -1,15 +1,6 @@
 # CIRR-docker up!
 # Merck, Spring 2016
 
-# Need in env $POSTGRES_USER, $POSTGRES_PASSWORD, $POSTGRES_CIRR_USER, $POSTGRES_CIRR_PASSWORD
-
-# Run this command to configure your shell on OSX:
-# $ eval "$(docker-machine env default)"; source .shadow_profile
-# $ ./bootstrap-orthanc.sh
-# $ docker-compose up
-
-# Need a splunk server that can attach to the log directories...
-
 version: '2.0'
 
 services:

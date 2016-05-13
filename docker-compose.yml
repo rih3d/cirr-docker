@@ -1,0 +1,111 @@
+# CIRR-docker up!
+# Merck, Spring 2016
+
+version: '2.0'
+
+services:
+
+  # ----------------------------
+  postgres:
+  # ----------------------------
+    image: postgres
+    ports:
+    - "5432:5432"
+    environment:
+
+      # Necessary for initialization
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /var/lib/postgresql/data
+
+    volumes:
+    - data:/var/lib/postgresql
+    - logs:/var/log/postgresql
+    # *.sh mounted in initdb.d will be sourced on run, should check to see if configured
+    # Drop XNAT if necessary, add orthanc and orthanc_recv
+    - ./bootstrap-postgres.sh:/docker-entrypoint-initdb.d/bootstrap.sh:ro
+
+    # Interacting with the database:
+    # $ docker exec -it cirrdocker_db_1 sh -c 'echo "ALTER USER xnat WITH PASSWORD '\''my_xnat_pword'\'';" | exec psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U ${POSTGRES_USER}'
+
+  # ----------------------------
+  orthanc:
+  # See <https://github.com/jodogne/OrthancDocker>
+  # ----------------------------
+
+    # Churn if postgres is not responsive
+    restart: on-failure:10
+
+    image: jodogne/orthanc-plugins
+    command: ["--logdir=/var/log/orthanc", "/etc/orthanc/"]
+    ports:
+    - "8042:4080"
+    - "4242:4042"
+    volumes:
+    - ./orthanc.shadow.json:/etc/orthanc/orthanc.json:ro
+    - data:/var/lib/orthanc/db
+    - logs:/var/log/orthanc
+    links:
+    - postgres
+    - xnat
+    depends_on:
+    - postgres
+    environment:
+      COMPRESSION: "true"
+      DB_NAME: "orthanc"
+
+  # ----------------------------
+  orthanc-receiver:
+  # ----------------------------
+    extends: orthanc
+    ports:
+    - "8042:4081"
+    - "4242:4043"
+    volumes:
+    - ./orthanc_recv.shadow.json:/etc/orthanc/orthanc.json:ro
+    - data/var/lib/orthanc_recv/db:/var/lib/orthanc/db
+    - logs/var/log/orthanc_recv:/var/log/orthanc
+    links:
+    - orthanc
+    environment:
+      COMPRESSION: "false"
+      DB_NAME: "orthanc_recv"
+      FORWARD_TO: "orthanc"
+
+  # ----------------------------
+  xnat:
+  # A configured local xnat template has to be built separately and tagged "xnat"
+  # ----------------------------
+    image: xnat
+    ports:
+    - "8080:8080"  # HTTP
+    - "8104:8042"  # DICOM
+    # - Unk API?
+    volumes:
+    - data:/data/xnat
+    links:
+    - postgres
+    - orthanc
+    - orthanc_recv
+    depends_on:
+    - postgres
+
+  # ----------------------------
+  splunk:
+  # ----------------------------
+    image: outcoldman/splunk:latest
+    volumes:
+    - data/var/lib/splunk/etc:/opt/splunk/etc
+    - data/var/lib/splunk/data:/opt/splunk/var
+    volumes_from:
+    - logs
+    ports:
+    - "5514:514"   # Syslog
+    - "5080:8000"  # HTTP
+    # - Unk API?
+    environment:
+      SPLUNK_START_ARGS: "--accept-license"
+
+volumes:
+  data: {}
+  logs: {}

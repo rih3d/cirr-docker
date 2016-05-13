@@ -1,0 +1,15 @@
+# CIRR-docker up! Admin interface
+# Merck, Spring 2016
+
+version: '2.0'
+
+services:
+
+  # ----------------------------
+  admin:
+  # ----------------------------
+    image: ubuntu
+
+    volumes_from:
+    - data
+    - logs
