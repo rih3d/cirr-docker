@@ -1,6 +1,10 @@
 """
 Derek Merck <derek_merck@brown.edu>
 Spring 2016
+
+The Medical Image Informatics Platform Bootstrapper
+
+Utility scripts for cleaning and setting up config for docker-compose defined MIIP services.
 """
 
 import logging
@@ -12,8 +16,11 @@ import subprocess
 import os
 
 __version__ = "0.1"
-__name__ = "Medical Image Informatics Platform Bootstrapper"
 __description__ = "Utility scripts for cleaning and setting up config for docker-compose defined MIIP services."
+
+# TODO: If forward in orthanc, modify and copy the autorouter lua
+# TODO: Build xnat image if doesn't exist
+# TODO: Better setup of Docker env vars or use Docker python API
 
 
 def parse_args():
@@ -103,6 +110,10 @@ def add_postgres_user(env):
         DB_PASSWORD=env['environment']['DB_PASSWORD'])
     exec_sql(sql)
 
+    sql = "ALTER USER {DB_USER} WITH CREATEDB".format(
+        DB_USER=env['environment']['DB_USER'])
+    exec_sql(sql)
+
     # List revised roles in DB
     exec_sql("\du")
 
@@ -134,7 +145,7 @@ def setup_xnat(env, **kwargs):
     # No need to create the database itself; the xnat builder insists on creating it
 
     # TODO: Create the config file
-    parse_template('???', env)
+    # parse_template('???', env)
 
     # TODO: Build and tag the xnat template for docker-compose
 
@@ -143,9 +154,12 @@ def clean_db(env):
     drop_postgres_database(env)
     drop_postgres_user(env)
 
-
 if __name__ == "__main__":
+
+    print "hi"
+
     logging.basicConfig(level=logging.DEBUG)
+    logging.debug("MIIP Bootstrapper v{version}".format(version=__version__))
 
     opts = parse_args()
 
@@ -162,12 +176,12 @@ if __name__ == "__main__":
         pass
 
     # Deal with extensions
-    for s,d in env['services'].iteritems():
+    for s, d in env['services'].iteritems():
         base_service = d.get('extends', None)
         if base_service:
             env['services'][s] = merge(d, env['services'][base_service])
 
-    # logging.info(pprint.pformat(env))
+    logging.info(pprint.pformat(env))
 
     # Get the DB host and port
     global_env = {}

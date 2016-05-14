@@ -1,19 +1,18 @@
 export PGHOST=postgres
-export PGUSER=xnat
-export PGPASSWORD=xnat
+export PGUSER= {{ env.DB_USER }}
+export PGPASSWORD= {{ env.DB_PASSWORD }}
 export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
 TOMCAT_HOME=/usr/local/tomcat
 
 xnat_version=1.6.5
 
-project_name=xnat
-db_name=xnat165
-site_title=XNAT-1.6.5
+project_name={{ xnat }}
+db_name= {{ env.DB_NAME }}
+site_title={{ default env.SITE_NAME XNAT }}
 
 xnat_repo=http://repo/
 
-data_dir="/opt/xnat"
+data_dir= {{ env.XNAT_DIR }}
 xnat_url="http://dockerengine:8080/xnat"
-site_title="Docker XNAT"
 
 # eof

@@ -1,3 +1,0 @@
-CREATE ROLE xnat PASSWORD 'xnat' CREATEDB LOGIN;
-
--- eof
