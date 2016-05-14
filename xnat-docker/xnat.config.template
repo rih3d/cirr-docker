@@ -6,13 +6,13 @@ TOMCAT_HOME=/usr/local/tomcat
 
 xnat_version=1.6.5
 
-project_name={{ xnat }}
+project_name=xnat
 db_name= {{ env.DB_NAME }}
-site_title={{ default env.SITE_NAME XNAT }}
+site_title={{ default env.XNAT_NAME XNAT }}
 
 xnat_repo=http://repo/
 
 data_dir= {{ env.XNAT_DIR }}
-xnat_url="http://dockerengine:8080/xnat"
+xnat_url={{ env.environment.XNAT_URL }}
 
 # eof

@@ -18,8 +18,7 @@ import os
 __version__ = "0.1"
 __description__ = "Utility scripts for cleaning and setting up config for docker-compose defined MIIP services."
 
-# TODO: If forward in orthanc, modify and copy the autorouter lua
-# TODO: Build xnat image if doesn't exist
+# TODO: If forward in orthanc env, modify and copy the autorouter lua
 # TODO: Better setup of Docker env vars or use Docker python API
 
 
@@ -144,10 +143,11 @@ def setup_xnat(env, **kwargs):
     add_postgres_user(env)
     # No need to create the database itself; the xnat builder insists on creating it
 
-    # TODO: Create the config file
-    # parse_template('???', env)
+    # Create the config file
+    parse_template('xnat-docker/xnat.config.template', 'xnat-docker/xnat.shadow.config', env)
 
-    # TODO: Build and tag the xnat template for docker-compose
+    # TODO: Build and tag the xnat template image for docker-compose if it doesn't exist
+    # TODO: Allow build even if the database already exists
 
 
 def clean_db(env):

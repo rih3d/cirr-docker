@@ -3,23 +3,24 @@
 Derek Merck <derek_merck@brown.edu>
 Rhode Island Hospital
 
-Spins up a Docker-based open source medical imaging informatics platform.  Originally developed to support the RIH Clinical Imaging Research Repository (CIRR).
+Spins up a Docker-based open-source[^splunk] medical imaging informatics platform.  Originally developed to support the RIH Clinical Imaging Research Repository (CIRR).
 
+[^splunk]: Splunk is not open source, but Splunk Lite will work for this volume of logs and it _is_ free.  Replace it with you open-source syslog server of choice if necessary.
 
 ### Services
 
-- Log Monitoring - [Splunk] Lite on 2080 (HTTP), 2081 (REST), 2514 (syslog)
-- Database - [Postgresql] on 3432 (SQL)
-- Clinical/PHI Facing Receiver - [Orthanc] on 4080 (HTTP/REST), 4042 (DICOM)
-- Clinical/PHI Facing Repository - Orthanc on 4081 (HTTP/REST), 4043 (DICOM)
-- Research/Anonymized Facing Repository - [XNAT] 1.6.5 on 5080 (HTTP), 5042 (DICOM), ??? (REST)
+- Clinical/PHI Facing Repository - [Orthanc] 1.0 on 4280 (HTTP/REST), 4242 (DICOM)
+- Clinical/PHI Facing Receiver - Orthanc on 4380 (HTTP/REST), 4342 (DICOM)
+- Research/Anonymized Facing Repository - [XNAT] 1.6.5 on 8080 (HTTP), 8042 (DICOM)
+- Database - [Postgresql] 9.5 on 3432 (SQL)
 - Data Orchestration - [Tithonus] on 6080 (HTTP)
+- Log Monitoring - [Splunk] Lite on 1580 (HTTP), 1514 (syslog)
 
-[Splunk]:(http://www.splunk.com)
-[Postgresql]:(http://www.postgresql.org)
-[Orthanc]:(http://www.orthanc-server.com)
-[XNAT]:(http://www.xnat.org)
-[Tithonus]:()
+[Splunk]:http://www.splunk.com
+[Postgresql]:http://www.postgresql.org
+[Orthanc]:http://www.orthanc-server.com
+[XNAT]:http://www.xnat.org
+[Tithonus]:https://github.com/derekmerck/Tithonus
 
 
 ## Dependencies
@@ -27,16 +28,16 @@ Spins up a Docker-based open source medical imaging informatics platform.  Origi
 - [Docker], [docker-compose] for service virtualization
 - [Python] 2.7, [pyyaml], [jinja2] for `bootstrap.py`
 
-[Docker]:
-[docker-compose]:
-[Python]:
-[pyyaml]:
-[jinja2]:
+[Docker]:http://www.docker.com
+[docker-compose]:https://docs.docker.com/compose/
+[Python]:http://www.python.org
+[pyyaml]:http://pyyaml.org
+[jinja2]:http://jinja.pocoo.org
 
 
 ## Configurations
 
-Warning: once data has been ingested, do _not_ use `docker-compose down`, or you will drop the data volume!
+Warning: once data has been ingested, _do not_ use `docker-compose down`, or you will drop the data volume!
 
 
 ### Orthanc w Postgres and Persistent Compressed Data Storage
@@ -55,7 +56,7 @@ $ docker-compose up orthanc-reciever
 
 The additional DICOM receiver can be used as a proxy to accept DICOM transfers and queue them for the main clinical-facing repository.  The main repo slows down considerably as the DB grows large, particularly if compression is on.[^orthanc_speed]
 
-[^orthanc_speed]:  On a reasonable machine, we measured about 20 images/second in an empty, uncompressed repo, about 1.5 scans/sec in a repo w 100k instances and compression on.
+[^orthanc_speed]:  On a reasonable machine, we measured about 20 images/second in an empty, uncompressed repo, but only about 1.5 scans/sec in a repo w 100k instances and compression on.
 
 
 ### XNAT w Postgres and Persistent Data Storage
