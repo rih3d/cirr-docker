@@ -18,8 +18,8 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PGDATA: /var/lib/postgresql/data
 
-      POSTGRES_CIRR_USER: ${POSTGRES_CIRR_USER}
-      POSTGRES_CIRR_PASSWORD: ${POSTGRES_CIRR_PASSWORD}
+      DB_USER: ${POSTGRES_CIRR_USER}
+      DB_PASSWORD: ${POSTGRES_CIRR_PASSWORD}
 
     volumes:
     - data:/var/lib/postgresql
