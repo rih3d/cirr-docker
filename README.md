@@ -3,9 +3,9 @@
 Derek Merck <derek_merck@brown.edu>
 Rhode Island Hospital
 
-Spins up a Docker-based open-source<sup>[1](#^splunk)</sup> medical imaging informatics platform.  Originally developed to support the RIH Clinical Imaging Research Repository (CIRR).
+Spins up a Docker-based open-source<sup><a name="^splunk">[1](#^splunk)</a></sup> medical imaging informatics platform.  Originally developed to support the RIH Clinical Imaging Research Repository (CIRR).
 
-<a name="^splunk">1</a>: Splunk is not open source, but Splunk Lite will work for this volume of logs and it _is_ free.  Replace it with you open-source syslog server of choice if necessary.:back:
+<a name="^splunk">1</a>: Splunk is not open source, but Splunk Lite will work for this volume of logs and it _is_ free.  Replace it with you open-source syslog server of choice if necessary.[:arrow_heading_up:](#^splunk_ref)
 
 
 ### Services
