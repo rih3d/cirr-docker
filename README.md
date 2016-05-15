@@ -3,9 +3,10 @@
 Derek Merck <derek_merck@brown.edu>
 Rhode Island Hospital
 
-Spins up a Docker-based open-source[^splunk] medical imaging informatics platform.  Originally developed to support the RIH Clinical Imaging Research Repository (CIRR).
+Spins up a Docker-based open-source medical imaging informatics platform.  Originally developed to support the RIH Clinical Imaging Research Repository (CIRR).
 
-[^splunk]: Splunk is not open source, but Splunk Lite will work for this volume of logs and it _is_ free.  Replace it with you open-source syslog server of choice if necessary.
+(Splunk is not open source, but Splunk Lite will work for this volume of logs and it _is_ free.  Replace it with you open-source syslog server of choice if necessary.)
+
 
 ### Services
 
@@ -38,6 +39,9 @@ Spins up a Docker-based open-source[^splunk] medical imaging informatics platfor
 ## Configurations
 
 Warning: once data has been ingested, _do not_ use `docker-compose down`, or you will drop the data volume!
+Furthermore, _do not_ use `docker-compose up` again with the xnat service, use `docker-compose up --no-recreate` or it will fail because the db already exists.
+
+`bootstrap.py` will read a file called `docker-compose.shadow.yml` and use any override variables or config information provided there.  All generated configuration files are similarly tagged as "shadow" and should not be indexed by `git`.  Depending on which variables are used, `docker-compose.shadow.yml` may not be necessary to include when creating the containers themselves.
 
 
 ### Orthanc w Postgres and Persistent Compressed Data Storage
@@ -54,9 +58,11 @@ $ python bootstrap.py orthanc orthanc-receiver
 $ docker-compose up orthanc-reciever
 ```
 
-The additional DICOM receiver can be used as a proxy to accept DICOM transfers and queue them for the main clinical-facing repository.  The main repo slows down considerably as the DB grows large, particularly if compression is on.[^orthanc_speed]
+The additional DICOM receiver can be used as a proxy to accept DICOM transfers and queue them for the main clinical-facing repository.  The main repo slows down considerably as the DB grows large, particularly if compression is on.
 
-[^orthanc_speed]:  On a reasonable machine, we measured about 20 images/second in an empty, uncompressed repo, but only about 1.5 scans/sec in a repo w 100k instances and compression on.
+(On a reasonable machine, we measured about 20 images/second in an empty, uncompressed repo, but only about 1.5 scans/sec in a repo w 100k instances and compression on.)
+
+An isolated Orthanc using a Postgres backend can be created directly using `docker-compose` from the [orthancp-docker](orthancp-docker) directory.  By default it will create a separate network.
 
 
 ### XNAT w Postgres and Persistent Data Storage
