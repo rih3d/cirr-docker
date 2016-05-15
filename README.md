@@ -3,9 +3,7 @@
 Derek Merck <derek_merck@brown.edu>
 Rhode Island Hospital
 
-Spins up a Docker-based open-source<sup><a name="^splunk">[1](#^splunk)</a></sup> medical imaging informatics platform.  Originally developed to support the RIH Clinical Imaging Research Repository (CIRR).
-
-<a name="^splunk">1</a>: Splunk is not open source, but Splunk Lite will work for this volume of logs and it _is_ free.  Replace it with you open-source syslog server of choice if necessary.[:arrow_heading_up:](#^splunk_ref)
+Spins up a Docker-based open-source<sup><a name="^splunk_ref">[1](#^splunk)</a></sup> medical imaging informatics platform.  Originally developed to support the RIH Clinical Imaging Research Repository (CIRR).
 
 
 ### Services
@@ -58,9 +56,7 @@ $ python bootstrap.py orthanc orthanc-receiver
 $ docker-compose up orthanc-reciever
 ```
 
-The additional DICOM receiver can be used as a proxy to accept DICOM transfers and queue them for the main clinical-facing repository.  The main repo slows down considerably as the DB grows large, particularly if compression is on.
-
-(On a reasonable machine, we measured about 20 images/second in an empty, uncompressed repo, but only about 1.5 scans/sec in a repo w 100k instances and compression on.)
+The additional DICOM receiver can be used as a proxy to accept DICOM transfers and queue them for the main clinical-facing repository.  The main repo slows down considerably as the DB grows large, particularly if compression is on.<sup><a name="^timing_ref">[2](#^timing)</a></sup>
 
 An isolated Orthanc using a Postgres backend can be created directly using `docker-compose` from the [orthancp-docker](orthancp-docker) directory.  By default it will create a separate network.
 
@@ -141,3 +137,9 @@ $ eval "$(docker-machine env default)"
 ## License
 
 MIT
+
+---
+
+<a name="^splunk">1</a>: Splunk is not open source, but Splunk Lite will work for this volume of logs and it _is_ free.  Replace it with you open-source syslog server of choice if necessary.[:arrow_heading_up:](#^splunk_ref)
+
+<a name="^timing">2</a>: On a reasonable machine, we measured about 20 images/second in an empty, uncompressed repo, but only about 1.5 scans/sec in a repo w 100k instances and compression on.[:arrow_heading_up:](#^timing_ref)
