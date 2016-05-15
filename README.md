@@ -3,7 +3,7 @@
 Derek Merck <derek_merck@brown.edu>
 Rhode Island Hospital
 
-Spins up a Docker-based open-source<sup><a name="^splunk_ref">[1](#^splunk)</a></sup> medical imaging informatics platform.  Originally developed to support the RIH Clinical Imaging Research Repository (CIRR).
+Configures and spins up a Docker-based open-source<sup><a name="^splunk_ref">[1](#^splunk)</a></sup> medical imaging informatics platform.  Originally developed to support the RIH Clinical Imaging Research Repository (CIRR).
 
 
 ## Services
@@ -12,7 +12,7 @@ Spins up a Docker-based open-source<sup><a name="^splunk_ref">[1](#^splunk)</a><
 - Clinical/PHI Facing Receiver - Orthanc on 4380 (HTTP/REST), 4342 (DICOM)
 - Research/Anonymized Facing Repository - [XNAT] 1.6.5 on 8080 (HTTP/REST), 8042 (DICOM)
 - Database - [Postgresql] 9.5 on 3432 (SQL)
-- Data Orchestration - [Tithonus] on 6080 (HTTP/REST)
+- Data Orchestration - _In progress_ <!--[Tithonus] on 6080 (HTTP/REST)-->
 - Log Monitoring - [Splunk] Lite on 1580 (HTTP/REST), 1514 (syslog)
 
 [Splunk]:http://www.splunk.com
@@ -37,7 +37,7 @@ Spins up a Docker-based open-source<sup><a name="^splunk_ref">[1](#^splunk)</a><
 ## Configurations
 
 Warning: once data has been ingested, _do not_ use `docker-compose down`, or you will drop the data volume!
-Furthermore, _do not_ use `docker-compose up` again with the xnat service, use `docker-compose up --no-recreate` or it will fail because the db already exists.
+Furthermore, _do not_ use `docker-compose up` (or `start`) with the xnat service; use `docker-compose up --no-recreate` (or `start --no-recreate`) or it will fail because it can't rebuild itself if the db already exists.
 
 `bootstrap.py` will read a file called `docker-compose.shadow.yml` and use any override variables or config information provided there.  All generated configuration files are similarly tagged as "shadow" and should not be indexed by `git`.  Depending on which variables are used, `docker-compose.shadow.yml` may not be necessary to include when creating the containers themselves.
 
@@ -68,7 +68,7 @@ $ python bootstrap.py xnat    # Initializes config from template, creates image,
 $ docker-compose up xnat
 ```
 
-
+<!--
 ### XNAT and Orthanc with a Tithonus Gatekeeper
 
 ```bash
@@ -77,7 +77,7 @@ $ docker-compose up orthanc xnat tithonus
 ```
 
 [Tithonus] can be configured to automatically move data from clinical DICOM sources into the clinical facing receiver, and from the clinical repository or other sources into the anonymized research-facing repository.
-
+-->
 
 ### XNAT and Orthanc with a Splunk Log Handler
 

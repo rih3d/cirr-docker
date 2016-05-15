@@ -3,11 +3,11 @@
 Derek Merck <derek_merck@brown.edu>
 Rhode Island Hospital
 
-Spins up a Docker-based Orthanc instance with a Postgres backend.
+Configures and spins up a Docker-based Orthanc instance with a Postgres backend.
 
 ## Requirements
 
-Set environment variables `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_CIRR_USER`, and `POSTGRES_CIRR_PASSWORD`.
+Set environment variables `POSTGRES_USER`, `POSTGRES_PASSWORD`, `DB_USER`, and `DB_PASSWORD`.
 
 ## Usage
 
