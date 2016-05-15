@@ -37,7 +37,7 @@ Configures and spins up a Docker-based open-source<sup><a name="^splunk_ref">[1]
 ## Configurations
 
 Warning: once data has been ingested, _do not_ use `docker-compose down`, or you will drop the data volume!
-Furthermore, _do not_ use `docker-compose up` (or `start`) with the xnat service; use `docker-compose up --no-recreate` (or `start --no-recreate`) or it will fail because it can't rebuild itself if the db already exists.
+Furthermore, _do not_ use `docker-compose up` with the xnat service; use `docker-compose up --no-recreate`  or it will fail because it can't rebuild itself if the db already exists.
 
 `bootstrap.py` will read a file called `docker-compose.shadow.yml` and use any override variables or config information provided there.  All generated configuration files are similarly tagged as "shadow" and should not be indexed by `git`.  Depending on which variables are used, `docker-compose.shadow.yml` may not be necessary to include when creating the containers themselves.
 
