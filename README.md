@@ -125,9 +125,9 @@ $ docker-compose run -f docker-compose.admin.yml admin tar zcvf /backup/xnat.tar
 
 Uses Docker images from:
 
-- [jodogne/orthanc]: https://github.com/jodogne/OrthancDocker
-- [chaseglove/xnat]: https://github.com/chaselgrove/xnat-docker
-- [outcoldman/splunk]:https://github.com/outcoldman/docker-splunk
+- [jodogne/orthanc](https://github.com/jodogne/OrthancDocker)
+- [chaseglove/xnat](https://github.com/chaselgrove/xnat-docker)
+- [outcoldman/splunk](https://github.com/outcoldman/docker-splunk)
 
 
 ## Note
