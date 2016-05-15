@@ -12,7 +12,7 @@ Configures and spins up a Docker-based open-source<sup><a name="^splunk_ref">[1]
 - Clinical/PHI Facing Receiver - Orthanc on 4380 (HTTP/REST), 4342 (DICOM)
 - Research/Anonymized Facing Repository - [XNAT] 1.6.5 on 8080 (HTTP/REST), 8042 (DICOM)
 - Database - [Postgresql] 9.5 on 3432 (SQL)
-- Data Orchestration - _In progress_ <!--[Tithonus] on 6080 (HTTP/REST)-->
+- Data Orchestration - _In progress_ <!--Tithonus on 6080 (HTTP/REST)-->
 - Log Monitoring - [Splunk] Lite on 1580 (HTTP/REST), 1514 (syslog)
 
 [Splunk]:http://www.splunk.com
