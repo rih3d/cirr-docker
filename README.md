@@ -6,14 +6,14 @@ Rhode Island Hospital
 Spins up a Docker-based open-source<sup><a name="^splunk_ref">[1](#^splunk)</a></sup> medical imaging informatics platform.  Originally developed to support the RIH Clinical Imaging Research Repository (CIRR).
 
 
-### Services
+## Services
 
 - Clinical/PHI Facing Repository - [Orthanc] 1.0 on 4280 (HTTP/REST), 4242 (DICOM)
 - Clinical/PHI Facing Receiver - Orthanc on 4380 (HTTP/REST), 4342 (DICOM)
-- Research/Anonymized Facing Repository - [XNAT] 1.6.5 on 8080 (HTTP), 8042 (DICOM)
+- Research/Anonymized Facing Repository - [XNAT] 1.6.5 on 8080 (HTTP/REST), 8042 (DICOM)
 - Database - [Postgresql] 9.5 on 3432 (SQL)
-- Data Orchestration - [Tithonus] on 6080 (HTTP)
-- Log Monitoring - [Splunk] Lite on 1580 (HTTP), 1514 (syslog)
+- Data Orchestration - [Tithonus] on 6080 (HTTP/REST)
+- Log Monitoring - [Splunk] Lite on 1580 (HTTP/REST), 1514 (syslog)
 
 [Splunk]:http://www.splunk.com
 [Postgresql]:http://www.postgresql.org

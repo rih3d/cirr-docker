@@ -5,11 +5,11 @@ Rhode Island Hospital
 
 Spins up a Docker-based Orthanc instance with a Postgres backend.
 
-### Requirements
+## Requirements
 
 Set environment variables `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_CIRR_USER`, and `POSTGRES_CIRR_PASSWORD`.
 
-### Usage
+## Usage
 
 ```bash
 $ ./bootstrap-orthanc.sh
