@@ -36,7 +36,7 @@ services:
     image: jodogne/orthanc-plugins
     command: ["--logdir=/var/log/orthanc", "/etc/orthanc/"]
     ports:
-    - "8042:4280"
+    - "8080:8042"
     - "4242:4242"
     links:
     - postgres
