@@ -53,9 +53,10 @@ services:
       COMPRESSION: "true"
 
       USERS: '{
-        admin: passw0rd
-        orthanc: orthanc
-        }'
+        "admin": "passw0rd",
+        "orthanc": "orthanc"
+      }'
+
 
       DICOM_MODALITIES: '{
         "sample_modality" : [ "STORESCP", "localhost", 2000 ]
@@ -74,7 +75,7 @@ services:
   orthanc-receiver:
   # ----------------------------
     # Should EXTEND orthanc, but then can't include links or deps in orthanc
-    image: orthanc
+    image: jodogne/orthanc-plugins
     ports:
     - "8042:4380"
     - "4242:4342"
@@ -91,7 +92,23 @@ services:
       COMPRESSION: "false"
       FORWARD_TO: "orthanc"
       LOG_EXPORTED: "false"
+
+      USERS: '{
+        "admin": "passw0rd",
+        "orthanc": "orthanc"
+      }'
+
+      DICOM_MODALITIES: '{
+        "sample_modality" : [ "STORESCP", "localhost", 2000 ]
+      }'
+
+      ORTHANC_PEERS: '{
+        "sample_peer"  : [ "http://localhost:8043/", "alice", "alicePassword" ]
+      }'
+
       DB_NAME: "orthanc_recv"
+      DB_USER: "orthanc"
+      DB_PASSWORD: "passw0rd"
 
   # ----------------------------
   xnat:

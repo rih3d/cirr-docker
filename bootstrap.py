@@ -147,7 +147,7 @@ def setup_xnat(env, **kwargs):
     parse_template('xnat-docker/xnat.config.template', 'xnat-docker/xnat.shadow.config', env)
 
     # TODO: Build and tag the xnat template image for docker-compose if it doesn't exist
-    # TODO: Allow build even if the database already exists
+    # TODO: Allow build even if the database already exists <https://github.com/chaselgrove/xnat-docker/issues/2>
 
 
 def clean_db(env):
@@ -189,10 +189,10 @@ if __name__ == "__main__":
     global_env['DB_PORT'] = env['services']['postgres']['ports'][0].split(":")[0]
 
     # Improve your Docker env
-    os.environ['DOCKER_TLS_VERIFY'] = "1"
-    os.environ['DOCKER_HOST'] = "tcp://192.168.99.100:2376"
-    os.environ['DOCKER_CERT_PATH'] = "/Users/derek/.docker/machine/machines/default"
-    os.environ['DOCKER_MACHINE_NAME'] = "default"
+    # os.environ['DOCKER_TLS_VERIFY'] = "1"
+    # os.environ['DOCKER_HOST'] = "tcp://192.168.99.100:2376"
+    # os.environ['DOCKER_CERT_PATH'] = "/Users/derek/.docker/machine/machines/default"
+    # os.environ['DOCKER_MACHINE_NAME'] = "default"
 
     if opts.clean:
         if 'orthanc' in opts.services:

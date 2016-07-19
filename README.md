@@ -37,9 +37,9 @@ Configures and spins up a Docker-based open-source<sup><a name="^splunk_ref">[1]
 ## Configurations
 
 Warning: once data has been ingested, _do not_ use `docker-compose down`, or you will drop the data volume!
-Furthermore, _do not_ use `docker-compose up` with the xnat service; use `docker-compose up --no-recreate`  or it will fail because it can't rebuild itself if the db already exists.
+Furthermore, _do not_ use `docker-compose up` with the xnat service; use `docker-compose up --no-recreate`  or it will fail because it can't rebuild itself if the database already exists.
 
-`bootstrap.py` will read a file called `docker-compose.shadow.yml` and use any override variables or config information provided there.  All generated configuration files are similarly tagged as "shadow" and should not be indexed by `git`.  Depending on which variables are used, `docker-compose.shadow.yml` may not be necessary to include when creating the containers themselves.
+`bootstrap.py` will read a file called `docker-compose.shadow.yml` and use any override variables or config information provided there.  All generated configuration files are similarly tagged as "shadow" and should not be indexed by `git` because they will contain plain-text account credentials.  Depending on which variables are used, `docker-compose.shadow.yml` may not be necessary to include when creating the containers themselves.
 
 
 ### Orthanc w Postgres and Persistent Compressed Data Storage
@@ -58,7 +58,7 @@ $ docker-compose up orthanc-reciever
 
 The additional DICOM receiver can be used as a proxy to accept DICOM transfers and queue them for the main clinical-facing repository.  The main repo slows down considerably as the DB grows large, particularly if compression is on.<sup><a name="^timing_ref">[2](#^timing)</a></sup>
 
-An isolated Orthanc using a Postgres backend can be created directly using `docker-compose` from the [orthancp-docker](orthancp-docker) directory.  By default it will create a separate network.
+An isolated Orthanc using a Postgres backend can be created directly using `docker-compose` from the [orthancp-docker](orthancp-docker) directory.  That version has a much simpler configuration process, and by default it will create services on a separate network.
 
 
 ### XNAT w Postgres and Persistent Data Storage
@@ -97,7 +97,7 @@ $ docker-compose up
 
 ### Administration
 
-To inspect the data or logs, mount the data volume on another container.
+To inspect the data or logs, mount the data volumes on another container.
 
 ```
 $ docker-compose up -f docker-compose.admin.yml admin
@@ -106,7 +106,7 @@ $ docker-compose up -f docker-compose.admin.yml admin
 Or manually for a single service:
 
 ```bash
-$ docker-compose run -it --volumes-from orthanc --volumes-from postgres --volumes-from xnat ubuntu /bin/bash
+$ docker-compose run -it --volumes-from orthanc ubuntu /bin/bash
 ```
 
 To perform a data backup, run `admin` or otherwise mount the volumes and use `tar`.
