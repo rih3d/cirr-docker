@@ -40,7 +40,8 @@ services:
     - "4242:4242"
     links:
     - postgres
-    - xnat
+#    - xnat
+# This link forces it to want to bring up xnat first?
     depends_on:
     - postgres
     volumes:
@@ -50,7 +51,7 @@ services:
     environment:
       SITE_NAME: "Orthanc"
       DICOM_AET:  "ORTHANC"
-      COMPRESSION: "true"
+#      COMPRESSION: "true"
 
       USERS: '{
         "admin": "passw0rd",

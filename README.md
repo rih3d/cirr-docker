@@ -41,19 +41,26 @@ Furthermore, _do not_ use `docker-compose up` with the xnat service; use `docker
 
 `bootstrap.py` will read a file called `docker-compose.shadow.yml` and use any override variables or config information provided there.  All generated configuration files are similarly tagged as "shadow" and should not be indexed by `git` because they will contain plain-text account credentials.  Depending on which variables are used, `docker-compose.shadow.yml` may not be necessary to include when creating the containers themselves.
 
+### Postgres
+
+Orthanc and XNAT services rely on Postgres.  The Postgres service has to be available before Orthanc or XNAT can be configured.
+
+```
+$ docker-compose up -d postgres
+```
 
 ### Orthanc w Postgres and Persistent Compressed Data Storage
 
 ```bash
 $ python bootstrap.py orthanc  # Sets up orthanc.json from template, adds db
-$ docker-compose up orthanc
+$ docker-compose up -d orthanc
 ```
 
 Orthanc with receiver proxy:
 
 ```bash
 $ python bootstrap.py orthanc orthanc-receiver
-$ docker-compose up orthanc-reciever
+$ docker-compose up -d orthanc orthanc-reciever
 ```
 
 The additional DICOM receiver can be used as a proxy to accept DICOM transfers and queue them for the main clinical-facing repository.  The main repo slows down considerably as the DB grows large, particularly if compression is on.<sup><a name="^timing_ref">[2](#^timing)</a></sup>
@@ -128,7 +135,7 @@ Uses Docker images from:
 
 ## Note
 
-Run this command to configure your shell to use docker-compose:
+Run this command to configure your shell to use `docker-compose` on OSX or Windows:
 
 ```
 $ eval "$(docker-machine env default)"
